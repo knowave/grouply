@@ -1,0 +1,11 @@
+.DS_Store
+
+# Go
+backend/tmp/
+
+# Frontend
+frontend/dist/
+frontend/node_modules/
+frontend/*.tsbuildinfo
+frontend/vite.config.d.ts
+frontend/vite.config.js
