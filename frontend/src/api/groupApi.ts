@@ -1,7 +1,7 @@
 import type { GenerateGroupRequest, GenerateGroupResponse } from "../types/group";
 import { MESSAGES } from "../constants/messages";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
+const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:1111`;
 const GROUP_GENERATE_ENDPOINT = `${API_BASE_URL}/api/v1/groups/generate`;
 
 type ErrorBody = {
