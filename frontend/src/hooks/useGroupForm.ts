@@ -3,29 +3,16 @@ import { generateGroups } from "../api/groupApi";
 import { MESSAGES } from "../constants/messages";
 import type { Rule, TeamResult } from "../types/group";
 
-const initialPeople = ["", ""];
 const initialTeams = ["", ""];
 
 export function useGroupForm() {
-  const [people, setPeople] = React.useState(initialPeople);
+  const [people, setPeople] = React.useState<string[]>([]);
   const [teams, setTeams] = React.useState(initialTeams);
   const [separateRules, setSeparateRules] = React.useState<Rule[]>([]);
   const [sameTeamRules, setSameTeamRules] = React.useState<Rule[]>([]);
   const [result, setResult] = React.useState<TeamResult[]>([]);
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
-
-  function addPerson() {
-    setPeople((current) => [...current, ""]);
-  }
-
-  function updatePerson(index: number, value: string) {
-    setPeople((current) => updateAt(current, index, value));
-  }
-
-  function removePerson(index: number) {
-    setPeople((current) => current.filter((_, itemIndex) => itemIndex !== index));
-  }
 
   function addTeam() {
     setTeams((current) => [...current, ""]);
@@ -64,7 +51,7 @@ export function useGroupForm() {
   }
 
   function reset() {
-    setPeople(initialPeople);
+    setPeople([]);
     setTeams(initialTeams);
     setSeparateRules([]);
     setSameTeamRules([]);
@@ -94,15 +81,13 @@ export function useGroupForm() {
 
   return {
     people,
+    setPeople,
     teams,
     separateRules,
     sameTeamRules,
     result,
     error,
     isLoading,
-    addPerson,
-    updatePerson,
-    removePerson,
     addTeam,
     updateTeam,
     removeTeam,
