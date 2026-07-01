@@ -1,8 +1,8 @@
 package controller
 
 import (
-	userService "grouply/backend/domains/user/service"
 	"grouply/backend/domains/user/dto"
+	userService "grouply/backend/domains/user/service"
 	"net/http"
 	"strconv"
 	"time"

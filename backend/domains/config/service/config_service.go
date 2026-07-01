@@ -13,7 +13,7 @@ func NewConfigService(repository *repository.ConfigRepository) *ConfigService {
 	return &ConfigService{repository: repository}
 }
 
-func (s *ConfigService) GetValue(key string) (string ,error) {
+func (s *ConfigService) GetValue(key string) (string, error) {
 	config, err := s.repository.FindByKey(key)
 
 	if err != nil {

@@ -11,7 +11,7 @@ type ConfigRepository struct {
 }
 
 func NewConfigRepository(db *gorm.DB) *ConfigRepository {
-	return &ConfigRepository{ db: db }
+	return &ConfigRepository{db: db}
 }
 
 func (r *ConfigRepository) FindByKey(key string) (*entity.Config, error) {
@@ -22,7 +22,7 @@ func (r *ConfigRepository) FindByKey(key string) (*entity.Config, error) {
 		return nil, err
 	}
 
-	return &config, nil	
+	return &config, nil
 }
 
 func (r *ConfigRepository) Save(config *entity.Config) error {
