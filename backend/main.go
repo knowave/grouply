@@ -2,6 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
+
+	"github.com/joho/godotenv"
 
 	teamController "grouply/backend/domains/team/controller"
 	teamService "grouply/backend/domains/team/service"
@@ -23,12 +26,16 @@ import (
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("⚠️ .env 파일 없음, 환경변수에서 설정을 읽습니다")
+	}
+
 	db, err := infrastructure.NewDatabase(
-		"localhost",
-		"3306",
-		"root",
-		"root",
-		"birthday_bot",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
 	)
 
 	if err != nil {
