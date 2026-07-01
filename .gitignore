@@ -2,6 +2,7 @@
 
 # Go
 backend/tmp/
+backend/.env
 
 # Frontend
 frontend/dist/
