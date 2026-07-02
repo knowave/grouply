@@ -1,24 +1,27 @@
 import React from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { MESSAGES } from "../../constants/messages";
+import type { Department } from "../../types/department";
 
 type Row = {
   name: string;
   email: string;
   slack_user_id: string;
   birthday: string;
+  department_id: number | null;
 };
 
 function emptyRow(): Row {
-  return { name: "", email: "", slack_user_id: "", birthday: "" };
+  return { name: "", email: "", slack_user_id: "", birthday: "", department_id: null };
 }
 
 type AddUsersPanelProps = {
+  departments: Department[];
   onSave: (rows: Row[]) => Promise<void>;
   globalSetStatus: (msg: string, isError: boolean) => void;
 };
 
-export function AddUsersPanel({ onSave, globalSetStatus }: AddUsersPanelProps) {
+export function AddUsersPanel({ departments, onSave, globalSetStatus }: AddUsersPanelProps) {
   const [rows, setRows] = React.useState<Row[]>([emptyRow()]);
   const [isSaving, setIsSaving] = React.useState(false);
 
@@ -70,10 +73,17 @@ export function AddUsersPanel({ onSave, globalSetStatus }: AddUsersPanelProps) {
     <section className="rounded-md border border-black/10 bg-white p-4 shadow-sm">
       <h2 className="mb-3 text-lg font-bold">{MESSAGES.addUsersTitle}</h2>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[700px] border-collapse text-sm">
+        <table className="w-full min-w-[820px] border-collapse text-sm">
           <thead>
             <tr>
-              {[MESSAGES.colName, MESSAGES.colEmail, MESSAGES.colSlackUserId, MESSAGES.colBirthday, MESSAGES.deleteButton].map((h) => (
+              {[
+                MESSAGES.colName,
+                MESSAGES.colEmail,
+                MESSAGES.colSlackUserId,
+                MESSAGES.colBirthday,
+                MESSAGES.colDepartment,
+                MESSAGES.deleteButton,
+              ].map((h) => (
                 <th key={h} className="border-b border-black/10 bg-[#f9fafb] px-3 py-2 text-left text-xs font-semibold text-black/60">
                   {h}
                 </th>
@@ -115,6 +125,28 @@ export function AddUsersPanel({ onSave, globalSetStatus }: AddUsersPanelProps) {
                     value={row.birthday}
                     onChange={(e) => updateRow(index, "birthday", e.target.value)}
                   />
+                </td>
+                <td className="border-b border-black/5 px-2 py-1.5">
+                  <select
+                    className="h-9 w-full rounded-md border border-black/10 px-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/15"
+                    value={row.department_id ?? ""}
+                    onChange={(e) =>
+                      setRows((prev) =>
+                        prev.map((r, i) =>
+                          i === index
+                            ? { ...r, department_id: e.target.value ? Number(e.target.value) : null }
+                            : r,
+                        ),
+                      )
+                    }
+                  >
+                    <option value="">{MESSAGES.noDepartmentOption}</option>
+                    {departments.map((d) => (
+                      <option key={d.ID} value={d.ID}>
+                        {d.Name}
+                      </option>
+                    ))}
+                  </select>
                 </td>
                 <td className="border-b border-black/5 px-2 py-1.5">
                   <button

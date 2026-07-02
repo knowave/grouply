@@ -1,4 +1,4 @@
-import type { CreateUserPayload, SlackUser, UpdateUserPayload } from "../types/user";
+import type { CreateDepartmentPayload, Department, UpdateDepartmentPayload } from "../types/department";
 import type { Paginated } from "../types/pagination";
 
 const API_BASE_URL = ""; // same-origin, /api는 nginx(배포) / vite proxy(개발)가 라우팅
@@ -30,43 +30,35 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-export type GetUsersParams = {
+export type GetDepartmentsParams = {
   page: number;
   size: number;
-  sort: string;
-  order: string;
   name?: string;
-  department?: string;
 };
 
-export function getUsers(params: GetUsersParams): Promise<Paginated<SlackUser>> {
-  const query = new URLSearchParams({
-    page: String(params.page),
-    size: String(params.size),
-    sort: params.sort,
-    order: params.order,
-  });
+export function getDepartments(params: GetDepartmentsParams): Promise<Paginated<Department>> {
+  const query = new URLSearchParams({ page: String(params.page), size: String(params.size) });
   if (params.name) query.set("name", params.name);
-  if (params.department) query.set("department", params.department);
-  return request<Paginated<SlackUser>>(`${API_BASE_URL}/api/v1/users?${query.toString()}`);
+  return request<Paginated<Department>>(`${API_BASE_URL}/api/v1/departments?${query.toString()}`);
 }
 
-export function createUsersBatch(users: CreateUserPayload[]): Promise<unknown> {
-  return request(`${API_BASE_URL}/api/v1/users/batch`, {
+export function createDepartments(departments: CreateDepartmentPayload[]): Promise<unknown> {
+  return request(`${API_BASE_URL}/api/v1/departments`, {
     method: "POST",
-    body: JSON.stringify(users),
+    body: JSON.stringify(departments),
   });
 }
 
-export function updateUser(id: number, payload: UpdateUserPayload): Promise<SlackUser> {
-  return request<SlackUser>(`${API_BASE_URL}/api/v1/users/${id}`, {
+export function updateDepartment(id: number, payload: UpdateDepartmentPayload): Promise<Department> {
+  return request<Department>(`${API_BASE_URL}/api/v1/departments/${id}`, {
     method: "PATCH",
     body: JSON.stringify(payload),
   });
 }
 
-export function deleteUser(id: number): Promise<null> {
-  return request<null>(`${API_BASE_URL}/api/v1/users/${id}`, {
+export function deleteDepartments(ids: number[]): Promise<unknown> {
+  return request(`${API_BASE_URL}/api/v1/departments`, {
     method: "DELETE",
+    body: JSON.stringify({ ids }),
   });
 }

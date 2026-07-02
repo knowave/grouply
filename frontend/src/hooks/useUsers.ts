@@ -6,47 +6,28 @@ import type { SlackUser, UpdateUserPayload } from "../types/user";
 export type SortField = "birthday" | "name";
 export type SortOrder = "asc" | "desc";
 
+const PAGE_SIZE = 10;
+
 export function useUsers() {
   const [users, setUsers] = React.useState<SlackUser[]>([]);
+  const [total, setTotal] = React.useState(0);
+  const [page, setPage] = React.useState(1);
   const [status, setStatus] = React.useState(MESSAGES.usersLoading);
   const [isError, setIsError] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [sort, setSort] = React.useState<SortField>("birthday");
   const [order, setOrder] = React.useState<SortOrder>("asc");
 
-  // Initial load on mount — setState only in .then/.catch (not synchronously in effect body)
-  React.useEffect(() => {
-    let cancelled = false;
-    userApi
-      .getUsers("birthday", "asc")
-      .then((data) => {
-        if (cancelled) return;
-        setUsers(data);
-        setStatus(MESSAGES.usersLoaded(data.length));
-        setIsError(false);
-        setIsLoading(false);
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return;
-        const message = err instanceof Error ? err.message : MESSAGES.unknownError;
-        setStatus(message);
-        setIsError(true);
-        setIsLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Used from event handlers (not effects)
-  async function loadUsers(s: SortField, o: SortOrder) {
+  // Used from event handlers and effects
+  const load = React.useCallback(async (p: SortField, o: SortOrder, pg: number) => {
     setStatus(MESSAGES.usersLoading);
     setIsError(false);
     setIsLoading(true);
     try {
-      const data = await userApi.getUsers(s, o);
-      setUsers(data);
-      setStatus(MESSAGES.usersLoaded(data.length));
+      const data = await userApi.getUsers({ page: pg, size: PAGE_SIZE, sort: p, order: o });
+      setUsers(data.items);
+      setTotal(data.total);
+      setStatus(MESSAGES.usersLoaded(data.items.length));
     } catch (err) {
       const message = err instanceof Error ? err.message : MESSAGES.unknownError;
       setStatus(message);
@@ -54,38 +35,54 @@ export function useUsers() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, []);
+
+  React.useEffect(() => {
+    load(sort, order, page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function changeSort(value: SortField) {
     setSort(value);
-    loadUsers(value, order);
+    setPage(1);
+    load(value, order, 1);
   }
 
   function changeOrder(value: SortOrder) {
     setOrder(value);
-    loadUsers(sort, value);
+    setPage(1);
+    load(sort, value, 1);
+  }
+
+  function goToPage(value: number) {
+    if (value < 1) return;
+    setPage(value);
+    load(sort, order, value);
   }
 
   async function saveUsersBatch(payloads: Parameters<typeof userApi.createUsersBatch>[0]) {
     await userApi.createUsersBatch(payloads);
-    await loadUsers(sort, order);
+    await load(sort, order, page);
     setStatus(MESSAGES.usersAdded(payloads.length));
   }
 
   async function saveUser(id: number, payload: UpdateUserPayload) {
     await userApi.updateUser(id, payload);
-    await loadUsers(sort, order);
+    await load(sort, order, page);
     setStatus(MESSAGES.userUpdated);
   }
 
   async function removeUser(id: number) {
     await userApi.deleteUser(id);
-    await loadUsers(sort, order);
+    await load(sort, order, page);
     setStatus(MESSAGES.userDeleted);
   }
 
   return {
     users,
+    total,
+    page,
+    size: PAGE_SIZE,
     status,
     isError,
     isLoading,
@@ -93,9 +90,10 @@ export function useUsers() {
     order,
     changeSort,
     changeOrder,
+    goToPage,
     saveUsersBatch,
     saveUser,
     removeUser,
-    reload: () => loadUsers(sort, order),
+    reload: () => load(sort, order, page),
   };
 }

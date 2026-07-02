@@ -1,14 +1,20 @@
 import React from "react";
 import { MESSAGES } from "../../constants/messages";
 import type { SlackUser, UpdateUserPayload } from "../../types/user";
+import type { Department } from "../../types/department";
 import type { SortField, SortOrder } from "../../hooks/useUsers";
 
 type UserListPanelProps = {
   users: SlackUser[];
+  departments: Department[];
   sort: SortField;
   order: SortOrder;
+  page: number;
+  size: number;
+  total: number;
   onSortChange: (value: SortField) => void;
   onOrderChange: (value: SortOrder) => void;
+  onPageChange: (page: number) => void;
   onUpdate: (id: number, payload: UpdateUserPayload) => Promise<void>;
   onDelete: (id: number, name: string) => Promise<void>;
   globalSetStatus: (msg: string, isError: boolean) => void;
@@ -21,14 +27,21 @@ function toDateInputValue(isoString: string) {
 
 export function UserListPanel({
   users,
+  departments,
   sort,
   order,
+  page,
+  size,
+  total,
   onSortChange,
   onOrderChange,
+  onPageChange,
   onUpdate,
   onDelete,
   globalSetStatus,
 }: UserListPanelProps) {
+  const totalPages = Math.max(1, Math.ceil(total / size));
+
   return (
     <section className="rounded-md border border-black/10 bg-white p-4 shadow-sm">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
@@ -65,10 +78,17 @@ export function UserListPanel({
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[700px] border-collapse text-sm">
+          <table className="w-full min-w-[820px] border-collapse text-sm">
             <thead>
               <tr>
-                {[MESSAGES.colName, MESSAGES.colEmail, MESSAGES.colSlackUserId, MESSAGES.colBirthday, MESSAGES.colActions].map((h) => (
+                {[
+                  MESSAGES.colName,
+                  MESSAGES.colEmail,
+                  MESSAGES.colSlackUserId,
+                  MESSAGES.colBirthday,
+                  MESSAGES.colDepartment,
+                  MESSAGES.colActions,
+                ].map((h) => (
                   <th key={h} className="border-b border-black/10 bg-[#f9fafb] px-3 py-2 text-left text-xs font-semibold text-black/60">
                     {h}
                   </th>
@@ -78,8 +98,9 @@ export function UserListPanel({
             <tbody>
               {users.map((user) => (
                 <UserRow
-                  key={user.ID}
+                  key={user.id}
                   user={user}
+                  departments={departments}
                   onUpdate={onUpdate}
                   onDelete={onDelete}
                   globalSetStatus={globalSetStatus}
@@ -89,21 +110,43 @@ export function UserListPanel({
           </table>
         </div>
       )}
+
+      <div className="mt-3 flex items-center justify-end gap-3 text-sm">
+        <span className="text-black/50">{MESSAGES.pageInfo(page, total, size)}</span>
+        <div className="flex gap-2">
+          <button
+            className="inline-flex h-8 items-center rounded-md border border-black/10 px-3 text-xs font-semibold hover:bg-black/[0.03] disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={page <= 1}
+            onClick={() => onPageChange(page - 1)}
+          >
+            {MESSAGES.prevPage}
+          </button>
+          <button
+            className="inline-flex h-8 items-center rounded-md border border-black/10 px-3 text-xs font-semibold hover:bg-black/[0.03] disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={page >= totalPages}
+            onClick={() => onPageChange(page + 1)}
+          >
+            {MESSAGES.nextPage}
+          </button>
+        </div>
+      </div>
     </section>
   );
 }
 
 type UserRowProps = {
   user: SlackUser;
+  departments: Department[];
   onUpdate: (id: number, payload: UpdateUserPayload) => Promise<void>;
   onDelete: (id: number, name: string) => Promise<void>;
   globalSetStatus: (msg: string, isError: boolean) => void;
 };
 
-function UserRow({ user, onUpdate, onDelete, globalSetStatus }: UserRowProps) {
-  const [name, setName] = React.useState(user.Name);
-  const [email, setEmail] = React.useState(user.Email);
-  const [birthday, setBirthday] = React.useState(toDateInputValue(user.Birthday));
+function UserRow({ user, departments, onUpdate, onDelete, globalSetStatus }: UserRowProps) {
+  const [name, setName] = React.useState(user.name);
+  const [email, setEmail] = React.useState(user.email);
+  const [birthday, setBirthday] = React.useState(toDateInputValue(user.birthday));
+  const [departmentId, setDepartmentId] = React.useState(user.department_id ?? null);
   const [isBusy, setIsBusy] = React.useState(false);
 
   async function handleUpdate() {
@@ -114,10 +157,11 @@ function UserRow({ user, onUpdate, onDelete, globalSetStatus }: UserRowProps) {
     if (!confirm(MESSAGES.confirmUpdate)) return;
     setIsBusy(true);
     try {
-      await onUpdate(user.ID, {
+      await onUpdate(user.id, {
         name: name.trim(),
         email: email.trim(),
         birthday: `${birthday}T00:00:00+09:00`,
+        department_id: departmentId,
       });
     } catch (err) {
       globalSetStatus(err instanceof Error ? err.message : MESSAGES.unknownError, true);
@@ -127,10 +171,10 @@ function UserRow({ user, onUpdate, onDelete, globalSetStatus }: UserRowProps) {
   }
 
   async function handleDelete() {
-    if (!confirm(MESSAGES.confirmDelete(user.Name))) return;
+    if (!confirm(MESSAGES.confirmDelete(user.name))) return;
     setIsBusy(true);
     try {
-      await onDelete(user.ID, user.Name);
+      await onDelete(user.id, user.name);
     } catch (err) {
       globalSetStatus(err instanceof Error ? err.message : MESSAGES.unknownError, true);
       setIsBusy(false);
@@ -151,10 +195,24 @@ function UserRow({ user, onUpdate, onDelete, globalSetStatus }: UserRowProps) {
         <input type="email" className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} />
       </td>
       <td className="border-b border-black/5 px-2 py-1.5">
-        <input className={readonlyClass} value={user.SlackUserID} readOnly />
+        <input className={readonlyClass} value={user.slack_user_id} readOnly />
       </td>
       <td className="border-b border-black/5 px-2 py-1.5">
         <input type="date" className={inputClass} value={birthday} onChange={(e) => setBirthday(e.target.value)} />
+      </td>
+      <td className="border-b border-black/5 px-2 py-1.5">
+        <select
+          className={inputClass}
+          value={departmentId ?? ""}
+          onChange={(e) => setDepartmentId(e.target.value ? Number(e.target.value) : null)}
+        >
+          <option value="">{MESSAGES.noDepartmentOption}</option>
+          {departments.map((d) => (
+            <option key={d.ID} value={d.ID}>
+              {d.Name}
+            </option>
+          ))}
+        </select>
       </td>
       <td className="border-b border-black/5 px-2 py-1.5">
         <div className="flex gap-2">
