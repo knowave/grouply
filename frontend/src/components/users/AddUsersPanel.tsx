@@ -20,7 +20,7 @@ const COLUMNS = [
   { label: MESSAGES.colEmail, required: true },
   { label: MESSAGES.colSlackUserId, required: true },
   { label: MESSAGES.colBirthday, required: true },
-  { label: MESSAGES.colDepartment, required: false },
+  { label: MESSAGES.colDepartment, required: true },
   { label: MESSAGES.deleteButton, required: false },
 ];
 
@@ -57,7 +57,11 @@ export function AddUsersPanel({ departments, onSave, globalSetStatus }: AddUsers
       globalSetStatus(MESSAGES.noUsersToAdd, true);
       return;
     }
-    if (filled.some((r) => !r.name.trim() || !r.email.trim() || !r.slack_user_id.trim() || !r.birthday)) {
+    if (
+      filled.some(
+        (r) => !r.name.trim() || !r.email.trim() || !r.slack_user_id.trim() || !r.birthday || !r.department_id,
+      )
+    ) {
       globalSetStatus(MESSAGES.fillAllFields, true);
       return;
     }

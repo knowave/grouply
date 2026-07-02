@@ -2,6 +2,7 @@ import { Building2, RefreshCw, Shuffle, Utensils } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AddUsersPanel } from "../components/users/AddUsersPanel";
 import { UserListPanel } from "../components/users/UserListPanel";
+import { Toast } from "../components/Toast";
 import { MESSAGES } from "../constants/messages";
 import { useUsers } from "../hooks/useUsers";
 import { useDepartments } from "../hooks/useDepartments";
@@ -20,11 +21,7 @@ export function UsersPage() {
 
   async function handleSaveBatch(rows: Parameters<typeof users.saveUsersBatch>[0]) {
     setLocalStatus(null);
-    try {
-      await users.saveUsersBatch(rows);
-    } catch (err) {
-      setStatus(err instanceof Error ? err.message : MESSAGES.unknownError, true);
-    }
+    await users.saveUsersBatch(rows);
   }
 
   return (
@@ -96,6 +93,9 @@ export function UsersPage() {
           globalSetStatus={setStatus}
         />
       </section>
+      {localStatus?.isError && (
+        <Toast message={localStatus.msg} onClose={() => setLocalStatus(null)} />
+      )}
     </main>
   );
 }

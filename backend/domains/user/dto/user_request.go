@@ -7,7 +7,7 @@ type CreateUserRequest struct {
 	Email        string    `json:"email" binding:"required"`
 	SlackUserID  string    `json:"slack_user_id" binding:"required"`
 	Birthday     time.Time `json:"birthday" binding:"required"`
-	DepartmentID *uint     `json:"department_id"`
+	DepartmentID *uint     `json:"department_id" binding:"required"`
 }
 
 type UserResponse struct {

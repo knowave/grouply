@@ -39,7 +39,7 @@ export const MESSAGES = {
   userUpdated: "멤버를 수정했습니다.",
   userDeleted: "멤버를 삭제했습니다.",
   usersEmpty: "등록된 멤버가 없습니다.",
-  fillAllFields: "이름, 이메일, Slack User ID, 생일을 모두 입력해주세요.",
+  fillAllFields: "이름, 이메일, Slack User ID, 생일, 부서를 모두 입력해주세요.",
   fillUpdateFields: "수정할 이름, 이메일, 생일을 모두 입력해주세요.",
   noUsersToAdd: "추가할 멤버를 입력해주세요.",
   filterNameLabel: "이름",
