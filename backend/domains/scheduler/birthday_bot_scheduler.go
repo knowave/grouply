@@ -41,9 +41,13 @@ func (s *BirthdayBotScheduler) Start() error {
 	if err != nil {
 		return err
 	}
-
+	
 	s.cron.Start()
-	log.Println("⏰ 스케줄러 시작: 매일 오전 10시에 생일 알림")
+
+	// 테스트용: 서버 실행 3초 후 1회 실행
+	// time.AfterFunc(3*time.Second, s.sendBirthdayNotification)
+
+	log.Println("⏰ 스케줄러 시작: 서버 실행 3초 후 생일 알림 실행 (테스트)")
 	return nil
 }
 

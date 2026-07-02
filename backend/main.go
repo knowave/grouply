@@ -21,6 +21,10 @@ import (
 	restaurantRepository "grouply/backend/domains/restaurant/repository"
 	restaurantService "grouply/backend/domains/restaurant/service"
 
+	departmentController "grouply/backend/domains/department/controller"
+	departmentRepository "grouply/backend/domains/department/repository"
+	departmentService "grouply/backend/domains/department/service"
+
 	"grouply/backend/infrastructure"
 	"grouply/backend/router"
 )
@@ -54,8 +58,12 @@ func main() {
 	teamService := teamService.NewTeamService()
 	teamController := teamController.NewTeamController(teamService)
 
+	departmentRepo := departmentRepository.NewDepartmentRepository(db.GetDB())
+	departmentSvc := departmentService.NewDepartmentService(departmentRepo)
+	departmentCtrl := departmentController.NewDepartmentController(departmentSvc)
+
 	userRepository := userRepository.NewUserRepository(db.GetDB())
-	userService := userService.NewUserService(userRepository)
+	userService := userService.NewUserService(userRepository, departmentSvc)
 	userController := userController.NewUserController(userService)
 
 	configRepository := configRepository.NewConfigRepository(db.GetDB())
@@ -87,7 +95,7 @@ func main() {
 	restaurantSvc := restaurantService.NewRestaurantService(restaurantRepo)
 	restaurantCtrl := restaurantController.NewRestaurantController(restaurantSvc)
 
-	r := router.NewRouter(teamController, userController, restaurantCtrl)
+	r := router.NewRouter(teamController, userController, restaurantCtrl, departmentCtrl)
 
 	if err := r.Run(":8080"); err != nil {
 		panic(err)

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"grouply/backend/domains/user/dto"
 	userService "grouply/backend/domains/user/service"
 	"net/http"
@@ -26,22 +27,36 @@ func (c *UserController) RegisterRoutes(r *gin.RouterGroup) {
 		users.GET("/today-birthdays", c.GetTodayBirthdays)
 		users.POST("", c.Create)
 		users.POST("/batch", c.CreateBatch)
-		users.PUT("/:id", c.Update)
+		users.PATCH("/:id", c.Update)
 		users.DELETE("/:id", c.Delete)
 	}
 }
 
 func (c *UserController) GetAll(ctx *gin.Context) {
+	page, err := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	if err != nil || page < 1 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "잘못된 page 값"})
+		return
+	}
+
+	size, err := strconv.Atoi(ctx.DefaultQuery("size", "10"))
+	if err != nil || size < 1 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "잘못된 size 값"})
+		return
+	}
+
+	name := ctx.Query("name")
+	department := ctx.Query("department")
 	sort := ctx.DefaultQuery("sort", "birthday")
 	order := ctx.DefaultQuery("order", "asc")
 
-	users, err := c.userService.GetAll(sort, order)
+	items, total, err := c.userService.GetAll(page, size, name, department, sort, order)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "조회 실패"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, users)
+	ctx.JSON(http.StatusOK, gin.H{"items": items, "total": total, "page": page, "size": size})
 }
 
 func (c *UserController) GetByID(ctx *gin.Context) {
@@ -75,14 +90,18 @@ func (c *UserController) GetTodayBirthdays(ctx *gin.Context) {
 }
 
 func (c *UserController) Create(ctx *gin.Context) {
-	var req dto.CreateSlackUserRequest
+	var req dto.CreateUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	user, err := c.userService.Create(req.Name, req.Email, req.SlackUserID, req.Birthday)
+	user, err := c.userService.Create(req.Name, req.Email, req.SlackUserID, req.Birthday, req.DepartmentID)
 	if err != nil {
+		if errors.Is(err, userService.ErrDepartmentNotFound) {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "존재하지 않는 부서입니다"})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "생성 실패"})
 		return
 	}
@@ -91,7 +110,7 @@ func (c *UserController) Create(ctx *gin.Context) {
 }
 
 func (c *UserController) CreateBatch(ctx *gin.Context) {
-	var requests []dto.CreateSlackUserRequest
+	var requests []dto.CreateUserRequest
 	if err := ctx.ShouldBindJSON(&requests); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -99,6 +118,10 @@ func (c *UserController) CreateBatch(ctx *gin.Context) {
 
 	err := c.userService.CreateAll(requests)
 	if err != nil {
+		if errors.Is(err, userService.ErrDepartmentNotFound) {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "존재하지 않는 부서입니다"})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "일괄 생성 실패"})
 		return
 	}
@@ -109,10 +132,11 @@ func (c *UserController) CreateBatch(ctx *gin.Context) {
 	})
 }
 
-type UpdateSlackUserRequest struct {
-	Name     string    `json:"name" binding:"required"`
-	Email    string    `json:"email" binding:"required"`
-	Birthday time.Time `json:"birthday" binding:"required"`
+type UpdateUserRequest struct {
+	Name         string    `json:"name" binding:"required"`
+	Email        string    `json:"email" binding:"required"`
+	Birthday     time.Time `json:"birthday" binding:"required"`
+	DepartmentID *uint     `json:"department_id"`
 }
 
 func (c *UserController) Update(ctx *gin.Context) {
@@ -122,14 +146,18 @@ func (c *UserController) Update(ctx *gin.Context) {
 		return
 	}
 
-	var req UpdateSlackUserRequest
+	var req UpdateUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	user, err := c.userService.Update(uint(id), req.Name, req.Email, req.Birthday)
+	user, err := c.userService.Update(uint(id), req.Name, req.Email, req.Birthday, req.DepartmentID)
 	if err != nil {
+		if errors.Is(err, userService.ErrDepartmentNotFound) {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "존재하지 않는 부서입니다"})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "수정 실패"})
 		return
 	}

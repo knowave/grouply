@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"fmt"
 
+	departmentEntity "grouply/backend/domains/department/entity"
 	restaurantEntity "grouply/backend/domains/restaurant/entity"
 	userEntity "grouply/backend/domains/user/entity"
 
@@ -30,8 +31,9 @@ func NewDatabase(host, port, user, password, dbname string) (*Database, error) {
 func (d *Database) AutoMigrate() error {
 	return d.db.AutoMigrate(
 		&userEntity.Config{},
-		&userEntity.SlackUser{},
+		&userEntity.User{},
 		&restaurantEntity.Restaurant{},
+		&departmentEntity.Department{},
 	)
 }
 
