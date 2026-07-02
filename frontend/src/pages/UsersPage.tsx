@@ -81,11 +81,15 @@ export function UsersPage() {
           departments={departments.departments}
           sort={users.sort}
           order={users.order}
+          name={users.name}
+          department={users.department}
           page={users.page}
           size={users.size}
           total={users.total}
           onSortChange={users.changeSort}
           onOrderChange={users.changeOrder}
+          onNameFilterChange={users.changeNameFilter}
+          onDepartmentFilterChange={users.changeDepartmentFilter}
           onPageChange={users.goToPage}
           onUpdate={users.saveUser}
           onDelete={users.removeUser}

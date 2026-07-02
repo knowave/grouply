@@ -17,6 +17,22 @@ function emptyRow(): Row {
   return { name: "", address: "", recommendedMenu: "", remark: "" };
 }
 
+const ADD_COLUMNS = [
+  { label: MESSAGES.colStoreName, required: true },
+  { label: MESSAGES.colAddress, required: true },
+  { label: MESSAGES.colRecommendedMenu, required: true },
+  { label: MESSAGES.colRemark, required: false },
+  { label: MESSAGES.deleteButton, required: false },
+];
+
+const LIST_COLUMNS = [
+  { label: MESSAGES.colStoreName, required: true },
+  { label: MESSAGES.colAddress, required: true },
+  { label: MESSAGES.colRecommendedMenu, required: true },
+  { label: MESSAGES.colRemark, required: false },
+  { label: MESSAGES.colActions, required: false },
+];
+
 export function RestaurantsPage() {
   const restaurants = useRestaurants();
   const [localStatus, setLocalStatus] = React.useState<{ msg: string; isError: boolean } | null>(null);
@@ -158,13 +174,30 @@ export function RestaurantsPage() {
 
         <section className="rounded-md border border-black/10 bg-white p-4 shadow-sm">
           <h2 className="mb-3 text-lg font-bold">{MESSAGES.addRestaurantsTitle}</h2>
+          <div className="mb-3 flex gap-2">
+            <button
+              className="inline-flex h-9 items-center gap-1 rounded-md border border-black/10 px-3 text-sm font-semibold hover:bg-black/[0.03]"
+              onClick={addRow}
+            >
+              <Plus size={15} />
+              {MESSAGES.addRowButton}
+            </button>
+            <button
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-brand px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#265d61] disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isSaving}
+              onClick={handleSave}
+            >
+              {MESSAGES.saveBatchButton}
+            </button>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[700px] border-collapse text-sm">
               <thead>
                 <tr>
-                  {[MESSAGES.colName, MESSAGES.colAddress, MESSAGES.colRecommendedMenu, MESSAGES.colRemark, MESSAGES.deleteButton].map((h) => (
-                    <th key={h} className="border-b border-black/10 bg-[#f9fafb] px-3 py-2 text-left text-xs font-semibold text-black/60">
-                      {h}
+                  {ADD_COLUMNS.map((col) => (
+                    <th key={col.label} className="border-b border-black/10 bg-[#f9fafb] px-3 py-2 text-left text-xs font-semibold text-black/60">
+                      {col.label}
+                      {col.required && <span className="text-red-500"> *</span>}
                     </th>
                   ))}
                 </tr>
@@ -176,7 +209,7 @@ export function RestaurantsPage() {
                       <input
                         className="h-9 w-full rounded-md border border-black/10 px-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/15"
                         value={row.name}
-                        placeholder={MESSAGES.colName}
+                        placeholder={MESSAGES.colStoreName}
                         onChange={(e) => updateRow(index, "name", e.target.value)}
                       />
                     </td>
@@ -218,22 +251,6 @@ export function RestaurantsPage() {
               </tbody>
             </table>
           </div>
-          <div className="mt-3 flex gap-2">
-            <button
-              className="inline-flex h-9 items-center gap-1 rounded-md border border-black/10 px-3 text-sm font-semibold hover:bg-black/[0.03]"
-              onClick={addRow}
-            >
-              <Plus size={15} />
-              {MESSAGES.addRowButton}
-            </button>
-            <button
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-brand px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#265d61] disabled:cursor-not-allowed disabled:opacity-60"
-              disabled={isSaving}
-              onClick={handleSave}
-            >
-              {MESSAGES.saveBatchButton}
-            </button>
-          </div>
         </section>
 
         <section className="rounded-md border border-black/10 bg-white p-4 shadow-sm">
@@ -247,9 +264,10 @@ export function RestaurantsPage() {
               <table className="w-full min-w-[700px] border-collapse text-sm">
                 <thead>
                   <tr>
-                    {[MESSAGES.colName, MESSAGES.colAddress, MESSAGES.colRecommendedMenu, MESSAGES.colRemark, MESSAGES.colActions].map((h) => (
-                      <th key={h} className="border-b border-black/10 bg-[#f9fafb] px-3 py-2 text-left text-xs font-semibold text-black/60">
-                        {h}
+                    {LIST_COLUMNS.map((col) => (
+                      <th key={col.label} className="border-b border-black/10 bg-[#f9fafb] px-3 py-2 text-left text-xs font-semibold text-black/60">
+                        {col.label}
+                        {col.required && <span className="text-red-500"> *</span>}
                       </th>
                     ))}
                   </tr>
@@ -309,21 +327,34 @@ function RestaurantRow({ restaurant, onUpdate, onDelete, globalSetStatus }: Rest
   const [recommendedMenu, setRecommendedMenu] = React.useState(restaurant.RecommendedMenu);
   const [remark, setRemark] = React.useState(restaurant.Remark);
   const [isBusy, setIsBusy] = React.useState(false);
+  const lastSaved = React.useRef({
+    name: restaurant.Name,
+    address: restaurant.Address,
+    recommendedMenu: restaurant.RecommendedMenu,
+    remark: restaurant.Remark,
+  });
 
-  async function handleUpdate() {
-    if (!name.trim() || !address.trim() || !recommendedMenu.trim()) {
+  async function handleFieldBlur(next: { name: string; address: string; recommendedMenu: string; remark: string }) {
+    const current = {
+      name: next.name.trim(),
+      address: next.address.trim(),
+      recommendedMenu: next.recommendedMenu.trim(),
+      remark: next.remark.trim(),
+    };
+    if (JSON.stringify(current) === JSON.stringify(lastSaved.current)) return;
+    if (!current.name || !current.address || !current.recommendedMenu) {
       globalSetStatus(MESSAGES.fillRestaurantUpdateFields, true);
       return;
     }
-    if (!confirm(MESSAGES.confirmUpdateRestaurant)) return;
     setIsBusy(true);
     try {
       await onUpdate(restaurant.ID, {
-        name: name.trim(),
-        address: address.trim(),
-        recommended_menu: recommendedMenu.trim(),
-        remark: remark.trim() || undefined,
+        name: current.name,
+        address: current.address,
+        recommended_menu: current.recommendedMenu,
+        remark: current.remark || undefined,
       });
+      lastSaved.current = current;
     } catch (err) {
       globalSetStatus(err instanceof Error ? err.message : MESSAGES.unknownError, true);
     } finally {
@@ -348,34 +379,49 @@ function RestaurantRow({ restaurant, onUpdate, onDelete, globalSetStatus }: Rest
   return (
     <tr className="hover:bg-[#fafafa]">
       <td className="border-b border-black/5 px-2 py-1.5">
-        <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} />
+        <input
+          className={inputClass}
+          value={name}
+          disabled={isBusy}
+          onChange={(e) => setName(e.target.value)}
+          onBlur={() => handleFieldBlur({ name, address, recommendedMenu, remark })}
+        />
       </td>
       <td className="border-b border-black/5 px-2 py-1.5">
-        <input className={inputClass} value={address} onChange={(e) => setAddress(e.target.value)} />
+        <input
+          className={inputClass}
+          value={address}
+          disabled={isBusy}
+          onChange={(e) => setAddress(e.target.value)}
+          onBlur={() => handleFieldBlur({ name, address, recommendedMenu, remark })}
+        />
       </td>
       <td className="border-b border-black/5 px-2 py-1.5">
-        <input className={inputClass} value={recommendedMenu} onChange={(e) => setRecommendedMenu(e.target.value)} />
+        <input
+          className={inputClass}
+          value={recommendedMenu}
+          disabled={isBusy}
+          onChange={(e) => setRecommendedMenu(e.target.value)}
+          onBlur={() => handleFieldBlur({ name, address, recommendedMenu, remark })}
+        />
       </td>
       <td className="border-b border-black/5 px-2 py-1.5">
-        <input className={inputClass} value={remark} onChange={(e) => setRemark(e.target.value)} />
+        <input
+          className={inputClass}
+          value={remark}
+          disabled={isBusy}
+          onChange={(e) => setRemark(e.target.value)}
+          onBlur={() => handleFieldBlur({ name, address, recommendedMenu, remark })}
+        />
       </td>
       <td className="border-b border-black/5 px-2 py-1.5">
-        <div className="flex gap-2">
-          <button
-            className="inline-flex h-9 items-center justify-center rounded-md bg-brand px-3 text-xs font-semibold text-white transition hover:bg-[#265d61] disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={isBusy}
-            onClick={handleUpdate}
-          >
-            {MESSAGES.editButton}
-          </button>
-          <button
-            className="inline-flex h-9 items-center justify-center rounded-md border border-red-200 px-3 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={isBusy}
-            onClick={handleDelete}
-          >
-            {MESSAGES.deleteButton}
-          </button>
-        </div>
+        <button
+          className="inline-flex h-9 items-center justify-center rounded-md border border-red-200 px-3 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={isBusy}
+          onClick={handleDelete}
+        >
+          {MESSAGES.deleteButton}
+        </button>
       </td>
     </tr>
   );

@@ -15,6 +15,15 @@ function emptyRow(): Row {
   return { name: "", email: "", slack_user_id: "", birthday: "", department_id: null };
 }
 
+const COLUMNS = [
+  { label: MESSAGES.colName, required: true },
+  { label: MESSAGES.colEmail, required: true },
+  { label: MESSAGES.colSlackUserId, required: true },
+  { label: MESSAGES.colBirthday, required: true },
+  { label: MESSAGES.colDepartment, required: false },
+  { label: MESSAGES.deleteButton, required: false },
+];
+
 type AddUsersPanelProps = {
   departments: Department[];
   onSave: (rows: Row[]) => Promise<void>;
@@ -72,20 +81,30 @@ export function AddUsersPanel({ departments, onSave, globalSetStatus }: AddUsers
   return (
     <section className="rounded-md border border-black/10 bg-white p-4 shadow-sm">
       <h2 className="mb-3 text-lg font-bold">{MESSAGES.addUsersTitle}</h2>
+      <div className="mb-3 flex gap-2">
+        <button
+          className="inline-flex h-9 items-center gap-1 rounded-md border border-black/10 px-3 text-sm font-semibold hover:bg-black/[0.03]"
+          onClick={addRow}
+        >
+          <Plus size={15} />
+          {MESSAGES.addRowButton}
+        </button>
+        <button
+          className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-brand px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#265d61] disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={isSaving}
+          onClick={handleSave}
+        >
+          {MESSAGES.saveBatchButton}
+        </button>
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[820px] border-collapse text-sm">
           <thead>
             <tr>
-              {[
-                MESSAGES.colName,
-                MESSAGES.colEmail,
-                MESSAGES.colSlackUserId,
-                MESSAGES.colBirthday,
-                MESSAGES.colDepartment,
-                MESSAGES.deleteButton,
-              ].map((h) => (
-                <th key={h} className="border-b border-black/10 bg-[#f9fafb] px-3 py-2 text-left text-xs font-semibold text-black/60">
-                  {h}
+              {COLUMNS.map((col) => (
+                <th key={col.label} className="border-b border-black/10 bg-[#f9fafb] px-3 py-2 text-left text-xs font-semibold text-black/60">
+                  {col.label}
+                  {col.required && <span className="text-red-500"> *</span>}
                 </th>
               ))}
             </tr>
@@ -161,22 +180,6 @@ export function AddUsersPanel({ departments, onSave, globalSetStatus }: AddUsers
             ))}
           </tbody>
         </table>
-      </div>
-      <div className="mt-3 flex gap-2">
-        <button
-          className="inline-flex h-9 items-center gap-1 rounded-md border border-black/10 px-3 text-sm font-semibold hover:bg-black/[0.03]"
-          onClick={addRow}
-        >
-          <Plus size={15} />
-          {MESSAGES.addRowButton}
-        </button>
-        <button
-          className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-brand px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#265d61] disabled:cursor-not-allowed disabled:opacity-60"
-          disabled={isSaving}
-          onClick={handleSave}
-        >
-          {MESSAGES.saveBatchButton}
-        </button>
       </div>
     </section>
   );

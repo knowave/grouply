@@ -14,6 +14,18 @@ function emptyRow(): Row {
   return { name: "", description: "" };
 }
 
+const ADD_COLUMNS = [
+  { label: MESSAGES.colName, required: true },
+  { label: MESSAGES.colDescription, required: false },
+  { label: MESSAGES.deleteButton, required: false },
+];
+
+const LIST_COLUMNS = [
+  { label: MESSAGES.colName, required: true },
+  { label: MESSAGES.colDescription, required: false },
+  { label: MESSAGES.colActions, required: false },
+];
+
 export function DepartmentsPage() {
   const departments = useDepartments();
   const [localStatus, setLocalStatus] = React.useState<{ msg: string; isError: boolean } | null>(null);
@@ -93,13 +105,30 @@ export function DepartmentsPage() {
 
         <section className="rounded-md border border-black/10 bg-white p-4 shadow-sm">
           <h2 className="mb-3 text-lg font-bold">{MESSAGES.addDepartmentsTitle}</h2>
+          <div className="mb-3 flex gap-2">
+            <button
+              className="inline-flex h-9 items-center gap-1 rounded-md border border-black/10 px-3 text-sm font-semibold hover:bg-black/[0.03]"
+              onClick={addRow}
+            >
+              <Plus size={15} />
+              {MESSAGES.addRowButton}
+            </button>
+            <button
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-brand px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#265d61] disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isSaving}
+              onClick={handleSave}
+            >
+              {MESSAGES.saveBatchButton}
+            </button>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[600px] border-collapse text-sm">
               <thead>
                 <tr>
-                  {[MESSAGES.colName, MESSAGES.colDescription, MESSAGES.deleteButton].map((h) => (
-                    <th key={h} className="border-b border-black/10 bg-[#f9fafb] px-3 py-2 text-left text-xs font-semibold text-black/60">
-                      {h}
+                  {ADD_COLUMNS.map((col) => (
+                    <th key={col.label} className="border-b border-black/10 bg-[#f9fafb] px-3 py-2 text-left text-xs font-semibold text-black/60">
+                      {col.label}
+                      {col.required && <span className="text-red-500"> *</span>}
                     </th>
                   ))}
                 </tr>
@@ -137,22 +166,6 @@ export function DepartmentsPage() {
               </tbody>
             </table>
           </div>
-          <div className="mt-3 flex gap-2">
-            <button
-              className="inline-flex h-9 items-center gap-1 rounded-md border border-black/10 px-3 text-sm font-semibold hover:bg-black/[0.03]"
-              onClick={addRow}
-            >
-              <Plus size={15} />
-              {MESSAGES.addRowButton}
-            </button>
-            <button
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-brand px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#265d61] disabled:cursor-not-allowed disabled:opacity-60"
-              disabled={isSaving}
-              onClick={handleSave}
-            >
-              {MESSAGES.saveBatchButton}
-            </button>
-          </div>
         </section>
 
         <section className="rounded-md border border-black/10 bg-white p-4 shadow-sm">
@@ -166,9 +179,10 @@ export function DepartmentsPage() {
               <table className="w-full min-w-[600px] border-collapse text-sm">
                 <thead>
                   <tr>
-                    {[MESSAGES.colName, MESSAGES.colDescription, MESSAGES.colActions].map((h) => (
-                      <th key={h} className="border-b border-black/10 bg-[#f9fafb] px-3 py-2 text-left text-xs font-semibold text-black/60">
-                        {h}
+                    {LIST_COLUMNS.map((col) => (
+                      <th key={col.label} className="border-b border-black/10 bg-[#f9fafb] px-3 py-2 text-left text-xs font-semibold text-black/60">
+                        {col.label}
+                        {col.required && <span className="text-red-500"> *</span>}
                       </th>
                     ))}
                   </tr>
@@ -226,16 +240,19 @@ function DepartmentRow({ department, onUpdate, onDelete, globalSetStatus }: Depa
   const [name, setName] = React.useState(department.Name);
   const [description, setDescription] = React.useState(department.Description);
   const [isBusy, setIsBusy] = React.useState(false);
+  const lastSaved = React.useRef({ name: department.Name, description: department.Description });
 
-  async function handleUpdate() {
-    if (!name.trim()) {
+  async function handleFieldBlur(next: { name: string; description: string }) {
+    const current = { name: next.name.trim(), description: next.description.trim() };
+    if (JSON.stringify(current) === JSON.stringify(lastSaved.current)) return;
+    if (!current.name) {
       globalSetStatus(MESSAGES.fillDepartmentUpdateFields, true);
       return;
     }
-    if (!confirm(MESSAGES.confirmUpdateDepartment)) return;
     setIsBusy(true);
     try {
-      await onUpdate(department.ID, { name: name.trim(), description: description.trim() || undefined });
+      await onUpdate(department.ID, { name: current.name, description: current.description || undefined });
+      lastSaved.current = current;
     } catch (err) {
       globalSetStatus(err instanceof Error ? err.message : MESSAGES.unknownError, true);
     } finally {
@@ -260,20 +277,25 @@ function DepartmentRow({ department, onUpdate, onDelete, globalSetStatus }: Depa
   return (
     <tr className="hover:bg-[#fafafa]">
       <td className="border-b border-black/5 px-2 py-1.5">
-        <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} />
+        <input
+          className={inputClass}
+          value={name}
+          disabled={isBusy}
+          onChange={(e) => setName(e.target.value)}
+          onBlur={() => handleFieldBlur({ name, description })}
+        />
       </td>
       <td className="border-b border-black/5 px-2 py-1.5">
-        <input className={inputClass} value={description} onChange={(e) => setDescription(e.target.value)} />
+        <input
+          className={inputClass}
+          value={description}
+          disabled={isBusy}
+          onChange={(e) => setDescription(e.target.value)}
+          onBlur={() => handleFieldBlur({ name, description })}
+        />
       </td>
       <td className="border-b border-black/5 px-2 py-1.5">
         <div className="flex gap-2">
-          <button
-            className="inline-flex h-9 items-center justify-center rounded-md bg-brand px-3 text-xs font-semibold text-white transition hover:bg-[#265d61] disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={isBusy}
-            onClick={handleUpdate}
-          >
-            {MESSAGES.editButton}
-          </button>
           <button
             className="inline-flex h-9 items-center justify-center rounded-md border border-red-200 px-3 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
             disabled={isBusy}
