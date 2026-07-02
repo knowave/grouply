@@ -4,6 +4,12 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: grouply-backend
+    environment:
+      DB_HOST: host.docker.internal
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: admin
     ports:
       - "1111:8080"
     networks:
@@ -17,7 +23,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "1212:5173"
+      - "1212:80"
     networks:
       - grouply-network
 
