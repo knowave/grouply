@@ -1,4 +1,4 @@
-import { Building2, RefreshCw, Shuffle } from "lucide-react";
+import { Building2, RefreshCw, Shuffle, Utensils } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AddUsersPanel } from "../components/users/AddUsersPanel";
 import { UserListPanel } from "../components/users/UserListPanel";
@@ -51,6 +51,13 @@ export function UsersPage() {
               <RefreshCw size={15} />
               {MESSAGES.reloadButton}
             </button>
+            <Link
+              to="/restaurants"
+              className="inline-flex h-10 items-center gap-2 rounded-md border border-black/10 px-4 text-sm font-semibold hover:bg-black/[0.03]"
+            >
+              <Utensils size={15} />
+              {MESSAGES.restaurantsNavButton}
+            </Link>
             <Link
               to="/departments"
               className="inline-flex h-10 items-center gap-2 rounded-md border border-black/10 px-4 text-sm font-semibold hover:bg-black/[0.03]"

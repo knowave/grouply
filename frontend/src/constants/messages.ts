@@ -72,6 +72,32 @@ export const MESSAGES = {
   departmentUpdated: "부서를 수정했습니다.",
   departmentDeleted: "부서를 삭제했습니다.",
 
+  // Restaurants page
+  restaurantsNavButton: "메뉴 추천",
+  restaurantsPageTitle: "Restaurants",
+  addRestaurantsTitle: "식당 추가",
+  restaurantListTitle: "식당 목록",
+  colAddress: "주소",
+  colRecommendedMenu: "추천 메뉴",
+  colRemark: "비고",
+  restaurantsEmpty: "등록된 식당이 없습니다.",
+  noRestaurantsToAdd: "추가할 식당을 입력해주세요.",
+  fillRestaurantFields: "식당명, 주소, 추천 메뉴를 입력해주세요.",
+  fillRestaurantUpdateFields: "수정할 식당명, 주소, 추천 메뉴를 입력해주세요.",
+  confirmDeleteRestaurant: (name: string) => `${name} 식당을 삭제할까요?`,
+  confirmUpdateRestaurant: "수정하시겠습니까?",
+  restaurantsLoading: "식당 목록을 불러오는 중입니다.",
+  restaurantsLoaded: (count: number) => `${count}곳의 식당을 불러왔습니다.`,
+  restaurantsAdded: (count: number) => `${count}곳의 식당을 추가했습니다.`,
+  restaurantUpdated: "식당을 수정했습니다.",
+  restaurantDeleted: "식당을 삭제했습니다.",
+  restaurantPageInfo: (page: number, total: number, size: number) =>
+    `${page} / ${Math.max(1, Math.ceil(total / size))} 페이지 (총 ${total}곳)`,
+  menuSearchPlaceholder: "메뉴로 검색 (예: 국밥)",
+  recommendButton: "랜덤 추천",
+  recommendEmpty: "추천할 식당이 없습니다. 먼저 식당을 등록해주세요.",
+  recommendResultTitle: "오늘의 추천",
+
   // Team generator page
   appTitle: "조건 기반 팀 자동 편성",
   appDescription: "조건만 입력하세요. 팀 구성은 Grouply가 합니다.",
