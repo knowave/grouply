@@ -12,6 +12,9 @@ FROM alpine:3.22
 
 WORKDIR /app
 
+RUN apk add --no-cache tzdata
+ENV TZ=Asia/Seoul
+
 COPY --from=builder /app/grouply-backend ./grouply-backend
 
 EXPOSE 8080
