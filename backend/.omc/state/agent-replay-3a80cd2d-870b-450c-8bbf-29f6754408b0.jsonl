@@ -1,0 +1,27 @@
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oh-my-claudecode:deep-interview"}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oh-my-claudecode:team"}
+{"t":0,"agent":"aworker","agent_type":"worker-1","event":"agent_stop","success":true,"synthetic":true,"telemetry_status":"unmatched_stop","reason":"SubagentStop arrived without a matching SubagentStart; native Agent/Task start telemetry was not observed."}
+{"t":0,"agent":"aworker","agent_type":"worker-3","event":"agent_stop","success":true,"synthetic":true,"telemetry_status":"unmatched_stop","reason":"SubagentStop arrived without a matching SubagentStart; native Agent/Task start telemetry was not observed."}
+{"t":0,"agent":"aworker","agent_type":"worker-4","event":"agent_stop","success":true,"synthetic":true,"telemetry_status":"unmatched_stop","reason":"SubagentStop arrived without a matching SubagentStart; native Agent/Task start telemetry was not observed."}
+{"t":0,"agent":"aworker","agent_type":"worker-1","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"aworker","agent_type":"worker-3","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"aworker","agent_type":"worker-2","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"aworker","agent_type":"worker-4","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"aworker","agent_type":"worker-1","event":"agent_stop","success":true,"duration_ms":1960,"synthetic":true,"telemetry_status":"unmatched_stop","reason":"SubagentStop arrived without a matching SubagentStart; native Agent/Task start telemetry was not observed."}
+{"t":0,"agent":"aworker","agent_type":"worker-3","event":"agent_stop","success":true,"duration_ms":2016,"synthetic":true,"telemetry_status":"unmatched_stop","reason":"SubagentStop arrived without a matching SubagentStart; native Agent/Task start telemetry was not observed."}
+{"t":0,"agent":"aworker","agent_type":"worker-2","event":"agent_stop","success":true,"duration_ms":2080}
+{"t":0,"agent":"aworker","agent_type":"worker-4","event":"agent_stop","success":true,"duration_ms":2285,"synthetic":true,"telemetry_status":"unmatched_stop","reason":"SubagentStop arrived without a matching SubagentStart; native Agent/Task start telemetry was not observed."}
+{"t":0,"agent":"a460203","agent_type":"untracked-native-fork","event":"agent_stop","success":true,"synthetic":true,"telemetry_status":"unmatched_stop","reason":"SubagentStop arrived without a matching SubagentStart; native Agent/Task start telemetry was not observed."}
+{"t":0,"agent":"a662857","agent_type":"untracked-native-fork","event":"agent_stop","success":true,"synthetic":true,"telemetry_status":"unmatched_stop","reason":"SubagentStop arrived without a matching SubagentStart; native Agent/Task start telemetry was not observed."}
+{"t":0,"agent":"system","event":"keyword_detected","keyword":"autopilot"}
+{"t":0,"agent":"system","event":"mode_change","mode_from":"none","mode_to":"autopilot"}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oh-my-claudecode:autopilot"}
+{"t":0,"agent":"abe6683","agent_type":"code-reviewer","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a8eebbf","agent_type":"code-reviewer","event":"agent_stop","success":true,"duration_ms":31489}
+{"t":0,"agent":"abe6683","agent_type":"code-reviewer","event":"agent_stop","success":true,"duration_ms":32996}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oh-my-claudecode:cancel"}
+{"t":0,"agent":"addcc06","agent_type":"untracked-native-fork","event":"agent_stop","success":true,"synthetic":true,"telemetry_status":"unmatched_stop","reason":"SubagentStop arrived without a matching SubagentStart; native Agent/Task start telemetry was not observed."}
+{"t":0,"agent":"system","event":"keyword_detected","keyword":"autopilot"}
+{"t":0,"agent":"system","event":"mode_change","mode_from":"none","mode_to":"autopilot"}
+{"t":0,"agent":"ae188cf","agent_type":"untracked-native-fork","event":"agent_stop","success":true,"synthetic":true,"telemetry_status":"unmatched_stop","reason":"SubagentStop arrived without a matching SubagentStart; native Agent/Task start telemetry was not observed."}
+{"t":0,"agent":"aworker","agent_type":"worker-2","event":"agent_stop","success":true,"duration_ms":28581}

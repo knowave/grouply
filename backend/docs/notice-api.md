@@ -117,7 +117,7 @@ PENDING --send--> PROCESSING --성공--> SENT
   "name": "일반 공지",
   "fields": [
     { "name": "title", "label": "공지 제목", "type": "text", "required": true },
-    { "name": "description", "label": "공지 내용", "type": "textarea", "required": true }
+    { "name": "description", "label": "공지 내용", "type": "markdown", "required": true }
   ]
 }
 ```
@@ -198,7 +198,8 @@ PENDING --send--> PROCESSING --성공--> SENT
     "locationUrl": "https://example.com/map",
     "description": "간식 제공"
   },
-  "message": "📢 [10월 타운홀]\n\n안녕하세요!\n타운홀 미팅 일정을 안내드립니다.\n\n📅 일시: 2026-10-20 14:00\n📍 장소: 3층 대회의실\n  "scheduledAt": "2026-10-20T13:50:00+09:00",
+  "message": "📢 [10월 타운홀]\n\n안녕하세요!\n타운홀 미팅 일정을 안내드립니다.\n\n📅 일시: 2026-10-20 14:00\n📍 장소: 3층 대회의실\n\n📝 안내 사항\n간식 제공\n\n많은 관심과 참여 부탁드립니다.\n감사합니다!",
+  "scheduledAt": "2026-10-20T13:50:00+09:00",
   "status": "PENDING",
   "sentAt": null,
   "createdAt": "2026-10-16T10:00:00+09:00",
@@ -440,7 +441,7 @@ PENDING --send--> PROCESSING --성공--> SENT
 감사합니다!
 ```
 
-이 템플릿만 링크 줄의 라벨이 `링크`입니다. `description`이 있으면 `📝 교육 안내` 블록이 추가됩니다.
+`description`이 있으면 `📝 교육 안내` 블록이 추가됩니다.
 
 ### 5.4 `GENERAL` 일반 공지
 
@@ -476,7 +477,7 @@ PENDING --send--> PROCESSING --성공--> SENT
 | `url` (`locationUrl`) | `http://` 또는 `https://` 시작 | `https://example.com/map` | `example.com`, `javascript:alert(1)` |
 | `scheduledAt` (요청) | `YYYY-MM-DD HH:mm`, 한국 시간, 초 없음 | `2026-10-20 13:50` | `2026-10-20T13:50:00+09:00`, `2026-10-20 13:50:00`, `2026-10-20 9:05` |
 
-- `message`에서 `&`, `<`, `>`는 Slack 형식에 맞게 `&amp;`, `&lt;`, `&gt;`로 바뀝니다.
+- `&`, `<`, `>` 이스케이프(`&amp;`, `&lt;`, `&gt;`)는 Slack 발송본에만 적용됩니다. 응답의 `message`는 원문 그대로입니다.
 - 값은 앞뒤 공백을 제거한 뒤 검증합니다.
 
 ---

@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -22,15 +23,10 @@ var (
 type NoticeService struct {
 	repo          *repository.NoticeRepository
 	configService *configService.ConfigService
-	slack         *infrastructure.Client
 }
 
-func NewNoticeService(
-	repo *repository.NoticeRepository,
-	configService *configService.ConfigService,
-	slack *infrastructure.Client,
-) *NoticeService {
-	return &NoticeService{repo: repo, configService: configService, slack: slack}
+func NewNoticeService(repo *repository.NoticeRepository, configService *configService.ConfigService) *NoticeService {
+	return &NoticeService{repo: repo, configService: configService}
 }
 
 func (s *NoticeService) Preview(req dto.NoticeRequest) (string, error) {
@@ -191,11 +187,16 @@ func (s *NoticeService) Send(id uint) (*entity.Notice, error) {
 }
 
 func (s *NoticeService) post(message string) (string, error) {
+	// token and channel are read per send, so config changes apply without a restart
+	token, err := s.configService.GetSlackNotiBotToken()
+	if err != nil || token == "" {
+		return "", fmt.Errorf("SLACK_NOTI_BOT_TOKEN 설정을 읽을 수 없습니다: %v", err)
+	}
 	channel, err := s.configService.GetSlackChannel()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("SLACK_CHANNEL 설정을 읽을 수 없습니다: %w", err)
 	}
-	return s.slack.PostMessage(channel, message)
+	return infrastructure.NewClient(token).PostMessage(channel, message)
 }
 
 // SendDue sends every PENDING notice whose scheduled time has passed (scheduler entry point).

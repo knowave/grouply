@@ -95,16 +95,8 @@ func main() {
 
 	defer birthdayScheduler.Stop()
 
-	notiToken, err := configService.GetSlackNotiBotToken()
-
-	if err != nil {
-		log.Println("⚠️ 공지용 Slack 토큰(SLACK_NOTI_BOT_TOKEN)이 없습니다. /api/configs로 등록해주세요")
-		notiToken = ""
-	}
-
-	noticeSlack := infrastructure.NewClient(notiToken)
 	noticeRepo := noticeRepository.NewNoticeRepository(db.GetDB())
-	noticeSvc := noticeService.NewNoticeService(noticeRepo, configService, noticeSlack)
+	noticeSvc := noticeService.NewNoticeService(noticeRepo, configService)
 	noticeCtrl := noticeController.NewNoticeController(noticeSvc)
 
 	noticeScheduler := scheduler.NewNoticeScheduler(noticeSvc)
