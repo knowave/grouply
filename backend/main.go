@@ -25,6 +25,10 @@ import (
 	departmentRepository "grouply/backend/domains/department/repository"
 	departmentService "grouply/backend/domains/department/service"
 
+	noticeController "grouply/backend/domains/notice/controller"
+	noticeRepository "grouply/backend/domains/notice/repository"
+	noticeService "grouply/backend/domains/notice/service"
+
 	"grouply/backend/infrastructure"
 	"grouply/backend/router"
 )
@@ -91,11 +95,31 @@ func main() {
 
 	defer birthdayScheduler.Stop()
 
+	notiToken, err := configService.GetSlackNotiBotToken()
+
+	if err != nil {
+		log.Println("⚠️ 공지용 Slack 토큰(SLACK_NOTI_BOT_TOKEN)이 없습니다. /api/configs로 등록해주세요")
+		notiToken = ""
+	}
+
+	noticeSlack := infrastructure.NewClient(notiToken)
+	noticeRepo := noticeRepository.NewNoticeRepository(db.GetDB())
+	noticeSvc := noticeService.NewNoticeService(noticeRepo, configService, noticeSlack)
+	noticeCtrl := noticeController.NewNoticeController(noticeSvc)
+
+	noticeScheduler := scheduler.NewNoticeScheduler(noticeSvc)
+
+	if err := noticeScheduler.Start(); err != nil {
+		log.Fatalf("공지 스케줄러 시작 실패: %v", err)
+	}
+
+	defer noticeScheduler.Stop()
+
 	restaurantRepo := restaurantRepository.NewRestaurantRepository(db.GetDB())
 	restaurantSvc := restaurantService.NewRestaurantService(restaurantRepo)
 	restaurantCtrl := restaurantController.NewRestaurantController(restaurantSvc)
 
-	r := router.NewRouter(teamController, userController, restaurantCtrl, departmentCtrl)
+	r := router.NewRouter(teamController, userController, restaurantCtrl, departmentCtrl, noticeCtrl)
 
 	if err := r.Run(":8080"); err != nil {
 		panic(err)

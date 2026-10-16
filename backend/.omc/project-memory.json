@@ -1,0 +1,132 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1792115901677,
+  "projectRoot": "/Users/ian/private/grouply/backend",
+  "techStack": {
+    "languages": [
+      {
+        "name": "Go",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "go.mod"
+        ]
+      }
+    ],
+    "frameworks": [],
+    "packageManager": "go",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "domains": {
+      "path": "domains",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1792115901667,
+      "keyFiles": []
+    },
+    "infrastructure": {
+      "path": "infrastructure",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1792115901667,
+      "keyFiles": [
+        "database.go",
+        "slack.go"
+      ]
+    },
+    "router": {
+      "path": "router",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1792115901667,
+      "keyFiles": [
+        "router.go"
+      ]
+    },
+    "domains/config": {
+      "path": "domains/config",
+      "purpose": "Configuration files",
+      "fileCount": 0,
+      "lastAccessed": 1792115901668,
+      "keyFiles": []
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "infrastructure/database.go",
+      "accessCount": 3,
+      "lastAccessed": 1792118195566,
+      "type": "file"
+    },
+    {
+      "path": "domains/notice/dto/notice_request.go",
+      "accessCount": 2,
+      "lastAccessed": 1792118307180,
+      "type": "file"
+    },
+    {
+      "path": "domains/notice/entity/notice.go",
+      "accessCount": 2,
+      "lastAccessed": 1792118307494,
+      "type": "file"
+    },
+    {
+      "path": "domains/notice/template/template.go",
+      "accessCount": 2,
+      "lastAccessed": 1792120010701,
+      "type": "file"
+    },
+    {
+      "path": "domains/notice/repository/notice_repository.go",
+      "accessCount": 1,
+      "lastAccessed": 1792118195243,
+      "type": "file"
+    },
+    {
+      "path": "router/router.go",
+      "accessCount": 1,
+      "lastAccessed": 1792118306416,
+      "type": "file"
+    },
+    {
+      "path": "domains/notice/controller/notice_controller.go",
+      "accessCount": 1,
+      "lastAccessed": 1792118306682,
+      "type": "file"
+    },
+    {
+      "path": "domains/notice/service/notice_service.go",
+      "accessCount": 1,
+      "lastAccessed": 1792118306895,
+      "type": "file"
+    },
+    {
+      "path": "docs/notice-api.md",
+      "accessCount": 1,
+      "lastAccessed": 1792118373399,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	departmentEntity "grouply/backend/domains/department/entity"
+	noticeEntity "grouply/backend/domains/notice/entity"
 	restaurantEntity "grouply/backend/domains/restaurant/entity"
 	userEntity "grouply/backend/domains/user/entity"
 
@@ -34,6 +35,7 @@ func (d *Database) AutoMigrate() error {
 		&userEntity.User{},
 		&restaurantEntity.Restaurant{},
 		&departmentEntity.Department{},
+		&noticeEntity.Notice{},
 	)
 }
 

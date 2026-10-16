@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	departmentController "grouply/backend/domains/department/controller"
+	noticeController "grouply/backend/domains/notice/controller"
 	restaurantController "grouply/backend/domains/restaurant/controller"
 	teamController "grouply/backend/domains/team/controller"
 	userController "grouply/backend/domains/user/controller"
@@ -16,6 +17,7 @@ func NewRouter(
 	userController *userController.UserController,
 	restaurantController *restaurantController.RestaurantController,
 	departmentController *departmentController.DepartmentController,
+	noticeController *noticeController.NoticeController,
 ) *gin.Engine {
 	r := gin.Default()
 	r.Use(corsMiddleware())
@@ -41,6 +43,17 @@ func NewRouter(
 	v1.POST("/departments", departmentController.Create)
 	v1.PATCH("/departments/:id", departmentController.Update)
 	v1.DELETE("/departments", departmentController.Delete)
+
+	v1.GET("/notice-templates", noticeController.GetTemplates)
+	v1.GET("/notice-templates/:code", noticeController.GetTemplate)
+
+	v1.POST("/notices/preview", noticeController.Preview)
+	v1.POST("/notices", noticeController.Create)
+	v1.GET("/notices", noticeController.GetAll)
+	v1.GET("/notices/:id", noticeController.GetByID)
+	v1.PATCH("/notices/:id", noticeController.Update)
+	v1.POST("/notices/:id/cancel", noticeController.Cancel)
+	v1.POST("/notices/:id/send", noticeController.Send)
 
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})

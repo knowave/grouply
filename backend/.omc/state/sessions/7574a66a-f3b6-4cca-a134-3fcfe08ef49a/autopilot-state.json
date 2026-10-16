@@ -1,0 +1,11 @@
+{
+  "active": true,
+  "started_at": "2026-10-16T04:34:04.509Z",
+  "original_prompt": "/autopilot \n\n일시, 장소, 위치, 안내사항 같은 소제목들도  bold 처리하고\n\ndescritpion 같은 것들은 markdown으로 받을거야.",
+  "session_id": "7574a66a-f3b6-4cca-a134-3fcfe08ef49a",
+  "project_path": "/Users/ian/private/grouply/backend",
+  "reinforcement_count": 4,
+  "awaiting_confirmation": true,
+  "awaiting_confirmation_set_at": "2026-10-16T04:34:04.509Z",
+  "last_checked_at": "2026-10-16T04:41:30.033Z"
+}

@@ -42,3 +42,7 @@ func (s *ConfigService) GetSlackBotToken() (string, error) {
 func (s *ConfigService) GetSlackChannel() (string, error) {
 	return s.GetValue("SLACK_CHANNEL")
 }
+
+func (s *ConfigService) GetSlackNotiBotToken() (string, error) {
+	return s.GetValue("SLACK_NOTI_BOT_TOKEN")
+}
