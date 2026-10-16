@@ -4,6 +4,7 @@ export const MESSAGES = {
   usersPageDescription: "멤버를 관리하고 생일 알림을 설정하세요.",
   openGeneratorButton: "조건 기반 팀 생성",
   departmentsNavButton: "부서 관리",
+  noticesNavButton: "공지",
   backToUsersButton: "멤버 목록",
   reloadButton: "새로고침",
   addUsersTitle: "멤버 추가",

@@ -1,0 +1,1 @@
+- 2026-10-16 notice-fe: 'yarn lint' already fails on 3 existing react-hooks/set-state-in-effect errors in src/hooks/use{Users,Departments,Restaurants}.ts. Workers can't rely on a full-repo lint pass.

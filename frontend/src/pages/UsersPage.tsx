@@ -1,4 +1,4 @@
-import { Building2, RefreshCw, Shuffle, Utensils } from "lucide-react";
+import { Building2, Megaphone, RefreshCw, Shuffle, Utensils } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AddUsersPanel } from "../components/users/AddUsersPanel";
 import { UserListPanel } from "../components/users/UserListPanel";
@@ -61,6 +61,13 @@ export function UsersPage() {
             >
               <Building2 size={15} />
               {MESSAGES.departmentsNavButton}
+            </Link>
+            <Link
+              to="/notices"
+              className="inline-flex h-10 items-center gap-2 rounded-md border border-black/10 px-4 text-sm font-semibold hover:bg-black/[0.03]"
+            >
+              <Megaphone size={15} />
+              {MESSAGES.noticesNavButton}
             </Link>
             <Link
               to="/team-generate"
